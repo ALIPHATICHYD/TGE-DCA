@@ -1,7 +1,7 @@
 [test_only]
-module move::move_tests;
+module tge_defi::move_tests;
 // uncomment this line to import the module
-use move::move;
+use tge_defi::move_module;
 
 const ENotImplemented: u64 = 0;
 /*
