@@ -1,8 +1,11 @@
-import { ConnectButton } from "@mysten/dapp-kit";
+import { ConnectButton, useCurrentAccount } from "@mysten/dapp-kit";
 import { Box, Container, Flex, Heading } from "@radix-ui/themes";
-import { WalletStatus } from "./WalletStatus";
+import { CreateVault } from "./components/CreateVault";
+import { VaultList } from "./components/VaultList";
 
 function App() {
+  const account = useCurrentAccount();
+
   return (
     <>
       <Flex
@@ -15,7 +18,7 @@ function App() {
         }}
       >
         <Box>
-          <Heading>dApp Starter Template</Heading>
+          <Heading>TGE DeFi - DCA Vault</Heading>
         </Box>
 
         <Box>
@@ -29,7 +32,21 @@ function App() {
           px="4"
           style={{ background: "var(--gray-a2)", minHeight: 500 }}
         >
-          <WalletStatus />
+          {!account ? (
+            <Box className="text-center py-8">
+              <Heading size="4" mb="4">
+                Welcome to TGE DeFi DCA Vault
+              </Heading>
+              <p className="text-gray-400">
+                Connect your wallet to create and manage DCA vaults
+              </p>
+            </Box>
+          ) : (
+            <div className="space-y-6">
+              <CreateVault />
+              <VaultList />
+            </div>
+          )}
         </Container>
       </Container>
     </>
