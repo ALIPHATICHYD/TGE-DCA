@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useSignAndExecuteTransaction } from '@mysten/dapp-kit';
 import { Transaction } from '@mysten/sui/transactions';
+import { Box, Card, Heading, TextField, Button, Select, Flex, Text } from '@radix-ui/themes';
 
 const PACKAGE_ID = import.meta.env.VITE_PACKAGE_ID || '0x0';
 
@@ -68,78 +69,72 @@ export function CreateVault() {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-4 text-gray-800">Create DCA Vault</h2>
-      <form onSubmit={handleCreateVault} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-1 text-gray-700">
-            Initial Deposit (SUI)
-          </label>
-          <input
-            type="number"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded text-gray-900"
-            placeholder="1000"
-            required
-            step="0.000000001"
-          />
-        </div>
+    <Card>
+      <Heading size="5" mb="4">Create DCA Vault</Heading>
+      <form onSubmit={handleCreateVault}>
+        <Flex direction="column" gap="4">
+          <Box>
+            <Text as="label" size="2" mb="1" weight="medium">
+              Initial Deposit (SUI)
+            </Text>
+            <TextField.Root
+              type="number"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              placeholder="1000"
+              required
+              step="0.000000001"
+            />
+          </Box>
 
-        <div>
-          <label className="block text-sm font-medium mb-1 text-gray-700">
-            Target Asset
-          </label>
-          <select
-            value={targetAsset}
-            onChange={(e) => setTargetAsset(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded text-gray-900"
-          >
-            <option value="SUI">SUI</option>
-            <option value="USDC">USDC</option>
-            <option value="USDT">USDT</option>
-          </select>
-        </div>
+          <Box>
+            <Text as="label" size="2" mb="1" weight="medium">
+              Target Asset
+            </Text>
+            <Select.Root value={targetAsset} onValueChange={setTargetAsset}>
+              <Select.Trigger style={{ width: '100%' }} />
+              <Select.Content>
+                <Select.Item value="SUI">SUI</Select.Item>
+                <Select.Item value="USDC">USDC</Select.Item>
+                <Select.Item value="USDT">USDT</Select.Item>
+              </Select.Content>
+            </Select.Root>
+          </Box>
 
-        <div>
-          <label className="block text-sm font-medium mb-1 text-gray-700">
-            Amount Per Trade (SUI)
-          </label>
-          <input
-            type="number"
-            value={amountPerTrade}
-            onChange={(e) => setAmountPerTrade(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded text-gray-900"
-            placeholder="50"
-            required
-            step="0.000000001"
-          />
-        </div>
+          <Box>
+            <Text as="label" size="2" mb="1" weight="medium">
+              Amount Per Trade (SUI)
+            </Text>
+            <TextField.Root
+              type="number"
+              value={amountPerTrade}
+              onChange={(e) => setAmountPerTrade(e.target.value)}
+              placeholder="50"
+              required
+              step="0.000000001"
+            />
+          </Box>
 
-        <div>
-          <label className="block text-sm font-medium mb-1 text-gray-700">
-            Frequency
-          </label>
-          <select
-            value={frequency}
-            onChange={(e) => setFrequency(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded text-gray-900"
-          >
-            <option value="1">Daily</option>
-            <option value="7">Weekly</option>
-            <option value="14">Bi-Weekly</option>
-            <option value="30">Monthly</option>
-          </select>
-        </div>
+          <Box>
+            <Text as="label" size="2" mb="1" weight="medium">
+              Frequency
+            </Text>
+            <Select.Root value={frequency} onValueChange={setFrequency}>
+              <Select.Trigger style={{ width: '100%' }} />
+              <Select.Content>
+                <Select.Item value="1">Daily</Select.Item>
+                <Select.Item value="7">Weekly</Select.Item>
+                <Select.Item value="14">Bi-Weekly</Select.Item>
+                <Select.Item value="30">Monthly</Select.Item>
+              </Select.Content>
+            </Select.Root>
+          </Box>
 
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
-        >
-          {isLoading ? 'Creating...' : 'Create Vault'}
-        </button>
+          <Button type="submit" disabled={isLoading} style={{ width: '100%' }}>
+            {isLoading ? 'Creating...' : 'Create Vault'}
+          </Button>
+        </Flex>
       </form>
-    </div>
+    </Card>
   );
 }
