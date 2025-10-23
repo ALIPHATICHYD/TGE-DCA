@@ -1,7 +1,9 @@
 import { useState } from 'react';
-import { useSignAndExecuteTransaction } from '@mysten/dapp-kit';
+import { useSignAndExecuteTransaction, useCurrentAccount } from '@mysten/dapp-kit';
 import { Transaction } from '@mysten/sui/transactions';
 import { Box, Card, Heading, TextField, Button, Select, Flex, Text } from '@radix-ui/themes';
+import { useQueryClient } from '@tanstack/react-query';
+import { useBalance } from '../hooks/useBalance';
 
 const PACKAGE_ID = import.meta.env.VITE_PACKAGE_ID || '0x0';
 
@@ -12,7 +14,10 @@ export function CreateVault() {
   const [targetAsset, setTargetAsset] = useState('SUI');
   const [isLoading, setIsLoading] = useState(false);
 
+  const account = useCurrentAccount();
   const { mutate: signAndExecute } = useSignAndExecuteTransaction();
+  const queryClient = useQueryClient();
+  const { balanceInSui, isLoading: isBalanceLoading } = useBalance();
 
   const handleCreateVault = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,6 +31,38 @@ export function CreateVault() {
       alert('Please fill in all fields');
       return;
     }
+
+    if (!account?.address) {
+      alert('Please connect your wallet first');
+      return;
+    }
+
+    // Validate amounts are positive numbers
+    const depositAmount = parseFloat(amount);
+    const tradeAmount = parseFloat(amountPerTrade);
+
+    if (isNaN(depositAmount) || depositAmount <= 0) {
+      alert('Initial Deposit must be a positive number');
+      return;
+    }
+
+    if (isNaN(tradeAmount) || tradeAmount <= 0) {
+      alert('Amount Per Trade must be a positive number');
+      return;
+    }
+
+    // Check if deposit amount is more than balance (add small gas buffer)
+    const gasBuffer = 0.001; // 0.001 SUI for transaction fees
+    if (depositAmount + gasBuffer > balanceInSui) {
+      alert(`Insufficient funds. You have ${balanceInSui.toFixed(4)} SUI but need at least ${(depositAmount + gasBuffer).toFixed(4)} SUI (including gas fees).`);
+      return;
+    }
+
+    // Check if amount per trade is more than deposit
+    if (tradeAmount > depositAmount) {
+      alert('Amount Per Trade cannot be greater than Initial Deposit');
+      return;
+    }
     
     setIsLoading(true);
 
@@ -33,26 +70,25 @@ export function CreateVault() {
       const tx = new Transaction();
       
       // Convert amounts to smallest unit (assuming 9 decimals for SUI)
-      const depositAmount = BigInt(parseFloat(amount) * 1_000_000_000);
-      const tradeAmount = BigInt(parseFloat(amountPerTrade) * 1_000_000_000);
+      const depositAmountBigInt = BigInt(Math.floor(depositAmount * 1_000_000_000));
+      const tradeAmountBigInt = BigInt(Math.floor(tradeAmount * 1_000_000_000));
       const frequencyMs = BigInt(parseInt(frequency) * 24 * 60 * 60 * 1000);
 
-      // Split coin for deposit and keep the rest
-      const coins = tx.splitCoins(tx.gas, [depositAmount]);
-      const depositCoin = coins[0];
+      const [depositCoin] = tx.splitCoins(tx.gas, [depositAmountBigInt]);
 
-      // Call create_vault function
-      tx.moveCall({
+      const vault = tx.moveCall({
         target: `${PACKAGE_ID}::dca::create_vault`,
         arguments: [
           depositCoin,
           tx.pure.string(targetAsset),
-          tx.pure.u64(tradeAmount),
+          tx.pure.u64(tradeAmountBigInt),
           tx.pure.u64(frequencyMs),
           tx.object('0x6'), // Clock object
         ],
         typeArguments: ['0x2::sui::SUI'],
       });
+
+      tx.transferObjects([vault], account.address);
 
       signAndExecute(
         {
@@ -62,16 +98,25 @@ export function CreateVault() {
           onSuccess: (result: any) => {
             console.log('Vault created:', result);
             alert('Vault created successfully!');
-            // Reset form
             setAmount('');
             setAmountPerTrade('');
             setFrequency('7');
             setTargetAsset('SUI');
             setIsLoading(false);
+            
+            // Invalidate query cache to trigger refetch
+            setTimeout(() => {
+              queryClient.invalidateQueries();
+            }, 1000);
           },
           onError: (error: any) => {
             console.error('Error creating vault:', error);
-            alert(`Failed to create vault: ${error?.message || 'Unknown error'}`);
+            const errorMessage = error?.message || 'Unknown error';
+            if (errorMessage.includes('insufficient')) {
+              alert('Insufficient funds in your wallet. Please check your balance.');
+            } else {
+              alert(`Failed to create vault: ${errorMessage}`);
+            }
             setIsLoading(false);
           },
         }
@@ -86,6 +131,11 @@ export function CreateVault() {
   return (
     <Card>
       <Heading size="5" mb="4">Create DCA Vault</Heading>
+      <Box mb="4">
+        <Text size="2" color="gray">
+          Your Balance: {isBalanceLoading ? 'Loading...' : `${balanceInSui.toFixed(4)} SUI`}
+        </Text>
+      </Box>
       <form onSubmit={handleCreateVault}>
         <Flex direction="column" gap="4">
           <Box>

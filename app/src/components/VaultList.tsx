@@ -1,11 +1,16 @@
+import { useState } from 'react';
 import { useVaults } from '../hooks/useVaults';
 import { useExecuteDCA } from '../hooks/useExecuteDCA';
 import { formatBalance, formatAddress, calculateNextExecution, isVaultReady } from '../lib/utils';
 import { Box, Card, Heading, Text, Flex, Grid, Button, Badge } from '@radix-ui/themes';
+import { WithdrawDialog } from './WithdrawDialog';
 
 export function VaultList() {
   const { vaults, isLoading, refetch } = useVaults();
   const { executeDCA } = useExecuteDCA();
+  const [withdrawDialogOpen, setWithdrawDialogOpen] = useState(false);
+  const [selectedVaultId, setSelectedVaultId] = useState<string | null>(null);
+  const [selectedVaultBalance, setSelectedVaultBalance] = useState(0);
 
   if (isLoading) {
     return (
@@ -14,6 +19,18 @@ export function VaultList() {
       </Box>
     );
   }
+
+  // Filter out vaults with 0 balance
+  const activeVaults = vaults?.filter((vault) => {
+    if (!vault.data || !vault.data.content) return false;
+    if (vault.data.content.dataType !== 'moveObject') return false;
+    
+    const fields = vault.data.content.fields as any;
+    if (!fields) return false;
+    
+    const vaultBalance = Number(formatBalance(fields.balance));
+    return vaultBalance > 0;
+  }) || [];
 
   if (!vaults || vaults.length === 0) {
     return (
@@ -25,11 +42,21 @@ export function VaultList() {
     );
   }
 
+  if (activeVaults.length === 0) {
+    return (
+      <Box py="8" style={{ textAlign: 'center' }}>
+        <Text color="gray">
+          All vaults have been emptied. Create a new vault to continue!
+        </Text>
+      </Box>
+    );
+  }
+
   return (
     <Box>
       <Heading size="5" mb="4">My DCA Vaults</Heading>
       <Flex direction="column" gap="4">
-        {vaults.map((vault) => {
+        {activeVaults.map((vault) => {
           if (!vault.data || !vault.data.content) return null;
           if (vault.data.content.dataType !== 'moveObject') return null;
           
@@ -87,6 +114,16 @@ export function VaultList() {
                 >
                   Execute DCA
                 </Button>
+                <Button
+                  variant="soft"
+                  onClick={() => {
+                    setSelectedVaultId(vault.data!.objectId);
+                    setSelectedVaultBalance(Number(formatBalance(fields.balance)));
+                    setWithdrawDialogOpen(true);
+                  }}
+                >
+                  Withdraw
+                </Button>
                 <Button variant="soft">
                   Settings
                 </Button>
@@ -95,6 +132,18 @@ export function VaultList() {
           );
         })}
       </Flex>
+
+      {selectedVaultId && (
+        <WithdrawDialog
+          vaultId={selectedVaultId}
+          vaultBalance={selectedVaultBalance}
+          isOpen={withdrawDialogOpen}
+          onClose={() => {
+            setWithdrawDialogOpen(false);
+            setSelectedVaultId(null);
+          }}
+        />
+      )}
     </Box>
   );
 }
