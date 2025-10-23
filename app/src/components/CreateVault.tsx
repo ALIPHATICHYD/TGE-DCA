@@ -16,6 +16,17 @@ export function CreateVault() {
 
   const handleCreateVault = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (PACKAGE_ID === '0x0') {
+      alert('Package ID is not configured. Please set VITE_PACKAGE_ID environment variable.');
+      return;
+    }
+    
+    if (!amount || !amountPerTrade) {
+      alert('Please fill in all fields');
+      return;
+    }
+    
     setIsLoading(true);
 
     try {
@@ -26,15 +37,16 @@ export function CreateVault() {
       const tradeAmount = BigInt(parseFloat(amountPerTrade) * 1_000_000_000);
       const frequencyMs = BigInt(parseInt(frequency) * 24 * 60 * 60 * 1000);
 
-      // Split coin for deposit
-      const [coin] = tx.splitCoins(tx.gas, [depositAmount]);
+      // Split coin for deposit and keep the rest
+      const coins = tx.splitCoins(tx.gas, [depositAmount]);
+      const depositCoin = coins[0];
 
       // Call create_vault function
       tx.moveCall({
         target: `${PACKAGE_ID}::dca::create_vault`,
         arguments: [
-          coin,
-          tx.pure.vector('u8', Array.from(new TextEncoder().encode(targetAsset))),
+          depositCoin,
+          tx.pure.string(targetAsset),
           tx.pure.u64(tradeAmount),
           tx.pure.u64(frequencyMs),
           tx.object('0x6'), // Clock object
@@ -44,7 +56,7 @@ export function CreateVault() {
 
       signAndExecute(
         {
-          transaction: tx as any,
+          transaction: tx,
         },
         {
           onSuccess: (result: any) => {
@@ -53,17 +65,20 @@ export function CreateVault() {
             // Reset form
             setAmount('');
             setAmountPerTrade('');
+            setFrequency('7');
+            setTargetAsset('SUI');
             setIsLoading(false);
           },
           onError: (error: any) => {
             console.error('Error creating vault:', error);
-            alert('Failed to create vault');
+            alert(`Failed to create vault: ${error?.message || 'Unknown error'}`);
             setIsLoading(false);
           },
         }
       );
     } catch (error) {
       console.error('Error:', error);
+      alert(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
       setIsLoading(false);
     }
   };
@@ -80,7 +95,7 @@ export function CreateVault() {
             <TextField.Root
               type="number"
               value={amount}
-              onChange={(e) => setAmount(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAmount(e.target.value)}
               placeholder="1000"
               required
               step="0.000000001"
@@ -108,7 +123,7 @@ export function CreateVault() {
             <TextField.Root
               type="number"
               value={amountPerTrade}
-              onChange={(e) => setAmountPerTrade(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAmountPerTrade(e.target.value)}
               placeholder="50"
               required
               step="0.000000001"

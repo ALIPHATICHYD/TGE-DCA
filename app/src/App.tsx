@@ -33,19 +33,19 @@ function App() {
           style={{ background: "var(--gray-a2)", minHeight: 500 }}
         >
           {!account ? (
-            <Box className="text-center py-8">
+            <Box style={{ textAlign: "center", padding: "32px 0" }}>
               <Heading size="4" mb="4">
                 Welcome to TGE DeFi DCA Vault
               </Heading>
-              <p className="text-gray-400">
+              <Box style={{ color: "var(--gray-11)" }}>
                 Connect your wallet to create and manage DCA vaults
-              </p>
+              </Box>
             </Box>
           ) : (
-            <div className="space-y-6">
+            <Box>
               <CreateVault />
               <VaultList />
-            </div>
+            </Box>
           )}
         </Container>
       </Container>

@@ -12,16 +12,33 @@ import { networkConfig } from "./networkConfig.ts";
 
 const queryClient = new QueryClient();
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <Theme appearance="dark">
-      <QueryClientProvider client={queryClient}>
-        <SuiClientProvider networks={networkConfig} defaultNetwork="testnet">
-          <WalletProvider autoConnect>
-            <App />
-          </WalletProvider>
-        </SuiClientProvider>
-      </QueryClientProvider>
-    </Theme>
-  </React.StrictMode>,
-);
+// Suppress wallet extension errors that don't affect functionality
+const originalError = console.error;
+console.error = (...args: any[]) => {
+  if (
+    typeof args[0] === 'string' &&
+    (args[0].includes('ethereum') ||
+      args[0].includes('WELLDONE') ||
+      args[0].includes('wallet'))
+  ) {
+    return;
+  }
+  originalError(...args);
+};
+
+const root = document.getElementById("root");
+if (root) {
+  ReactDOM.createRoot(root).render(
+    <React.StrictMode>
+      <Theme appearance="dark">
+        <QueryClientProvider client={queryClient}>
+          <SuiClientProvider networks={networkConfig} defaultNetwork="testnet">
+            <WalletProvider autoConnect>
+              <App />
+            </WalletProvider>
+          </SuiClientProvider>
+        </QueryClientProvider>
+      </Theme>
+    </React.StrictMode>
+  );
+}
