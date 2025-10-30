@@ -8,8 +8,8 @@ import { useBalance } from '../hooks/useBalance';
 const PACKAGE_ID = import.meta.env.VITE_PACKAGE_ID || '0x0';
 
 const TOKEN_ICONS: Record<string, string> = {
-  SUI: '◎',
-  USDC: '⊚',
+  SUI: '💧',
+  USDC: '©',
   USDT: '₮',
 };
 

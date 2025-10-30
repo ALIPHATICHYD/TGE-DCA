@@ -105,7 +105,7 @@ export function VaultList() {
                   Current Balance
                 </Text>
                 <Text size="6" weight="bold" mb="2">
-                  ◎ {balance.toFixed(2)}
+                  💧 {balance.toFixed(2)}
                 </Text>
                 <Text size="1" color="gray">
                   SUI
