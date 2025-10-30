@@ -42,10 +42,10 @@ function App() {
               </Box>
             </Box>
           ) : (
-            <Box>
+            <Flex direction="column" gap="6">
               <CreateVault />
               <VaultList />
-            </Box>
+            </Flex>
           )}
         </Container>
       </Container>

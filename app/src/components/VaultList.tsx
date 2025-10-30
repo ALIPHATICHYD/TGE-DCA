@@ -54,8 +54,10 @@ export function VaultList() {
 
   return (
     <Box>
-      <Heading size="5" mb="4">My DCA Vaults</Heading>
-      <Flex direction="column" gap="4">
+      <Heading size="5" mb="6">My DCA Vaults</Heading>
+      
+      {/* Vaults Grid */}
+      <Grid columns={{ initial: '1', sm: '2', lg: '3' }} gap="4" mb="6">
         {activeVaults.map((vault) => {
           if (!vault.data || !vault.data.content) return null;
           if (vault.data.content.dataType !== 'moveObject') return null;
@@ -65,60 +67,159 @@ export function VaultList() {
 
           const ready = isVaultReady(fields.last_execution_ms, fields.frequency_ms);
           const nextExecution = calculateNextExecution(fields.last_execution_ms, fields.frequency_ms);
+          const balance = Number(formatBalance(fields.balance));
 
           return (
-            <Card key={vault.data.objectId}>
-              <Grid columns="2" gap="4" mb="4">
+            <Card
+              key={vault.data.objectId}
+              style={{
+                background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(79, 70, 229, 0.08) 100%)',
+                border: '1px solid rgba(59, 130, 246, 0.15)',
+                borderRadius: '16px',
+                padding: '20px',
+                transition: 'all 0.3s ease',
+                cursor: 'pointer',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.borderColor = 'rgba(59, 130, 246, 0.4)';
+                (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 24px rgba(59, 130, 246, 0.1)';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.borderColor = 'rgba(59, 130, 246, 0.15)';
+                (e.currentTarget as HTMLElement).style.boxShadow = 'none';
+              }}
+            >
+              {/* Header: Status Badge */}
+              <Flex justify="between" align="start" mb="4">
                 <Box>
-                  <Text size="2" color="gray">Vault ID</Text>
-                  <Text size="2" style={{ fontFamily: 'monospace' }}>
-                    {formatAddress(vault.data.objectId)}
+                  <Text size="1" color="gray">Vault</Text>
+                </Box>
+                <Badge color={fields.is_active ? 'green' : 'red'}>
+                  {fields.is_active ? 'Active' : 'Paused'}
+                </Badge>
+              </Flex>
+
+              {/* Main Balance Display */}
+              <Box mb="4">
+                <Text size="1" color="gray" mb="1">
+                  Current Balance
+                </Text>
+                <Text size="6" weight="bold" mb="2">
+                  ◎ {balance.toFixed(2)}
+                </Text>
+                <Text size="1" color="gray">
+                  SUI
+                </Text>
+              </Box>
+
+              {/* Stats Grid */}
+              <Grid columns="2" gap="3" mb="4">
+                <Box
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    borderRadius: '10px',
+                    padding: '12px',
+                  }}
+                >
+                  <Text size="1" color="gray">Per Trade</Text>
+                  <Text size="2" weight="bold">
+                    {formatBalance(fields.amount_per_trade)}
+                  </Text>
+                  <Text size="1" color="gray">SUI</Text>
+                </Box>
+
+                <Box
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    borderRadius: '10px',
+                    padding: '12px',
+                  }}
+                >
+                  <Text size="1" color="gray">Executions</Text>
+                  <Text size="2" weight="bold">
+                    {fields.total_executions}
                   </Text>
                 </Box>
-                <Box>
-                  <Text size="2" color="gray">Status</Text>
-                  <Badge color={fields.is_active ? 'green' : 'red'}>
-                    {fields.is_active ? 'Active' : 'Paused'}
-                  </Badge>
+
+                <Box
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    borderRadius: '10px',
+                    padding: '12px',
+                  }}
+                >
+                  <Text size="1" color="gray">Invested</Text>
+                  <Text size="2" weight="bold">
+                    {formatBalance(fields.total_invested)}
+                  </Text>
+                  <Text size="1" color="gray">SUI</Text>
                 </Box>
-                <Box>
-                  <Text size="2" color="gray">Balance</Text>
-                  <Text weight="bold">{formatBalance(fields.balance)} SUI</Text>
-                </Box>
-                <Box>
-                  <Text size="2" color="gray">Amount Per Trade</Text>
-                  <Text weight="bold">{formatBalance(fields.amount_per_trade)} SUI</Text>
-                </Box>
-                <Box>
-                  <Text size="2" color="gray">Total Executions</Text>
-                  <Text weight="bold">{fields.total_executions}</Text>
-                </Box>
-                <Box>
-                  <Text size="2" color="gray">Total Invested</Text>
-                  <Text weight="bold">{formatBalance(fields.total_invested)} SUI</Text>
-                </Box>
-                <Box style={{ gridColumn: 'span 2' }}>
-                  <Text size="2" color="gray">Next Execution</Text>
-                  <Text weight="bold">
-                    {nextExecution.toLocaleString()}
-                    {ready && <Text color="green" ml="2">(Ready!)</Text>}
+
+                <Box
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    borderRadius: '10px',
+                    padding: '12px',
+                  }}
+                >
+                  <Text size="1" color="gray">Status</Text>
+                  <Text
+                    size="2"
+                    weight="bold"
+                    color={ready ? 'green' : 'gray'}
+                  >
+                    {ready ? '✓ Ready' : 'Pending'}
                   </Text>
                 </Box>
               </Grid>
 
+              {/* Next Execution Info */}
+              <Box
+                style={{
+                  background: 'rgba(59, 130, 246, 0.1)',
+                  border: '1px solid rgba(59, 130, 246, 0.2)',
+                  borderRadius: '10px',
+                  padding: '10px 12px',
+                  marginBottom: '16px',
+                }}
+              >
+                <Text size="1" color="gray" mb="1">
+                  Next Execution
+                </Text>
+                <Text size="1" weight="medium">
+                  {nextExecution.toLocaleString()}
+                </Text>
+              </Box>
+
+              {/* ID Display */}
+              <Box mb="4">
+                <Text size="1" color="gray">ID</Text>
+                <Text
+                  size="1"
+                  style={{
+                    fontFamily: 'monospace',
+                    wordBreak: 'break-all',
+                    opacity: 0.7,
+                  }}
+                >
+                  {formatAddress(vault.data.objectId)}
+                </Text>
+              </Box>
+
+              {/* Action Buttons */}
               <Flex gap="2">
                 <Button
                   onClick={() => executeDCA(vault.data!.objectId, refetch)}
                   disabled={!ready || !fields.is_active}
                   style={{ flex: 1 }}
                 >
-                  Execute DCA
+                  Execute
                 </Button>
                 <Button
                   variant="soft"
                   onClick={() => {
                     setSelectedVaultId(vault.data!.objectId);
-                    setSelectedVaultBalance(Number(formatBalance(fields.balance)));
+                    setSelectedVaultBalance(balance);
                     setWithdrawDialogOpen(true);
                   }}
                 >
@@ -131,7 +232,7 @@ export function VaultList() {
             </Card>
           );
         })}
-      </Flex>
+      </Grid>
 
       {selectedVaultId && (
         <WithdrawDialog
