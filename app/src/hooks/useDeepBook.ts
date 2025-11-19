@@ -33,7 +33,7 @@ export function useDeepBook() {
       const deepbookClient = new DeepBookClient({
         address: account.address,
         env: network,
-        client: suiClient,
+        client: suiClient as unknown as any,
       });
 
       return {
