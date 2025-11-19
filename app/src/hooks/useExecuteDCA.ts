@@ -1,9 +1,9 @@
 import { useSignAndExecuteTransaction } from '@mysten/dapp-kit';
 import { Transaction } from '@mysten/sui/transactions';
 
-const PACKAGE_ID = import.meta.env.TGE_PACKAGE_ID;
+const PACKAGE_ID = import.meta.env.VITE_PACKAGE_ID || import.meta.env.TGE_PACKAGE_ID;
 if (!PACKAGE_ID) {
-  console.warn('TGE_PACKAGE_ID is not set in environment variables. Using fallback value "0x0".');
+  console.warn('VITE_PACKAGE_ID is not set in environment variables. Using fallback value "0x0".');
 }
 const DCA_PACKAGE_ID = PACKAGE_ID || '0x0';
 

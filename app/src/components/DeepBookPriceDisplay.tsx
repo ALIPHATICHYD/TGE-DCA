@@ -33,6 +33,11 @@ export function DeepBookPriceDisplay({
       return;
     }
 
+    if (!poolKey) {
+      setError('Pool key not provided');
+      return;
+    }
+
     const fetchPrice = async () => {
       setLoading(true);
       setError(null);
@@ -41,23 +46,37 @@ export function DeepBookPriceDisplay({
         const network = (import.meta.env.VITE_DEEPBOOK_NETWORK ||
           'testnet') as 'testnet' | 'mainnet';
 
+        if (!network) {
+          throw new Error('Network configuration missing');
+        }
+
         const suiClient = new SuiClient({
           url: getFullnodeUrl(network),
         });
 
+        if (!suiClient) {
+          throw new Error('Failed to initialize Sui client');
+        }
+
         const deepbookClient = new DeepBookClient({
           address: account.address,
           env: network,
-          client: suiClient,
+          client: suiClient as any,
         });
+
+        if (!deepbookClient) {
+          throw new Error('Failed to initialize DeepBook client');
+        }
 
         const currentPrice = await getCurrentPrice(poolKey, deepbookClient);
         setPrice(currentPrice);
       } catch (err) {
-        setError(
-          err instanceof Error ? err.message : 'Failed to fetch price'
-        );
-        console.error('Error fetching DeepBook price:', err);
+        const errorMsg = err instanceof Error ? err.message : 'Failed to fetch price';
+        setError(errorMsg);
+        // Only log detailed error once, not repeatedly
+        if (Math.random() < 0.1) { // Log ~10% of errors to reduce noise
+          console.error('Error fetching DeepBook price:', err);
+        }
       } finally {
         setLoading(false);
       }
