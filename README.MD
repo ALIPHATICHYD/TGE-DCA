@@ -25,11 +25,25 @@ Traditional DCA strategies on centralized exchanges (CEX) require users to:
 
 1. **Financial Sovereignty**: Users maintain complete custody of their assets
 2. **Transparency**: All trading logic is visible and auditable on the blockchain
-3. **Accessibility**: zkLogin integration allows Web2 users to participate without crypto wallets
-4. **Cost Efficiency**: Sponsored transactions reduce barriers to entry
-5. **Risk Mitigation**: Eliminates centralized exchange counterparty risk
-6. **DeFi Integration**: Direct integration with DeepBook for optimal execution
-7. **Flexible Automation**: Users can customize their investment strategies
+3. **Privacy-Preserving**: Nautilus integration enables confidential order execution while maintaining on-chain verifiability
+4. **Accessibility**: zkLogin integration allows Web2 users to participate without crypto wallets
+5. **Cost Efficiency**: Sponsored transactions reduce barriers to entry
+6. **Risk Mitigation**: Eliminates centralized exchange counterparty risk
+7. **DeFi Integration**: Direct integration with DeepBook for optimal execution
+8. **Flexible Automation**: Users can customize their investment strategies
+
+### Privacy & Security Features
+
+**Nautilus Off-Chain Computation Framework:**
+- Delegates sensitive computations (order execution, vault logic) to Trusted Execution Environments (TEEs) like AWS Nitro Enclaves
+- Secure, tamper-resistant environment isolated from external interference
+- Cryptographic attestations verified by on-chain Sui smart contracts
+- Enables private order execution without exposing sensitive trade data to the public blockchain
+
+**Seal Encryption & Key Management:**
+- On-chain decryption for verifying encrypted vault data
+- SessionKey-based encryption for secure fund management
+- Maintains user privacy while ensuring auditability
 
 ---
 
@@ -48,26 +62,39 @@ Traditional DCA strategies on centralized exchanges (CEX) require users to:
                   │
                   | 
                   │                       
-┌─────────────────▼─────────┐  
-│   SUI BLOCKCHAIN          │  
-│                           │ 
-│  ┌────────────────────┐   │  
-│  │  DCA Vault         │   │  
-│  │  Smart Contract    │   │  
-│  │                    │   │  
-│  │  - Create vault    │   │  
-│  │  - Execute DCA     │   │
-│  │  - Manage funds    │   │
-│  └────────┬───────────┘   │
-│           │               │
-│  ┌────────▼───────────┐   │
-│  │  DeepBook          │   │
-│  │  Integration       │   │
-│  │                    │   │
-│  │  - Swap USDC→SUI   │   │
-│  │  - Limit orders    │   │
-│  └────────────────────┘   │
-└───────────────────────────┘
+┌─────────────────▼────────────────────────────────────────┐  
+│   SUI BLOCKCHAIN (On-Chain Verification)                 │  
+│                                                          │ 
+│  ┌────────────────────────────────────────────┐         │  
+│  │  DCA Vault Smart Contract                  │         │  
+│  │                                            │         │  
+│  │  - Create vault                            │         │
+│  │  - Verify Nautilus TEE attestations       │         │
+│  │  - Manage on-chain fund state             │         │
+│  │  - Execute verified DCA orders            │         │
+│  └────────┬─────────────────────────────────┘         │
+│           │                                            │
+│  ┌────────▼────────────────────────────────────┐      │
+│  │  DeepBook DEX Integration                   │      │
+│  │                                             │      │
+│  │  - Optimal price execution                 │      │
+│  │  - Swap USDC → SUI or other assets        │      │
+│  │  - Order book queries                      │      │
+│  └─────────────────────────────────────────────┘      │
+└────────────────┬──────────────────────────────────────┘
+                 │
+        ┌────────▼──────────┐
+        │  NAUTILUS TEEs    │ (Off-Chain Computation)
+        │                   │
+        │ AWS Nitro        │
+        │ Enclaves         │
+        │                   │
+        │ - Private order   │
+        │   execution       │
+        │ - Vault logic     │
+        │ - Generate        │
+        │   attestations    │
+        └───────────────────┘
 ```
 
 ### Technology Stack
@@ -77,6 +104,14 @@ Traditional DCA strategies on centralized exchanges (CEX) require users to:
 - Sui Framework dependencies
 - DeepBook integration for DEX trading
 - Shared Clock object for time-based execution
+- Nautilus attestation verification for TEE-based computations
+
+**Off-Chain Computation (Nautilus):**
+- Trusted Execution Environments (TEEs) via AWS Nitro Enclaves
+- Secure, tamper-resistant order execution
+- Cryptographic attestation generation
+- Private trade data processing
+- Complex vault logic computation
 
 **Frontend (Next.js + TypeScript):**
 - Next.js 14 with App Router
@@ -85,6 +120,7 @@ Traditional DCA strategies on centralized exchanges (CEX) require users to:
 - @mysten/sui.js for blockchain interaction
 - TailwindCSS for styling
 - React hooks for state management
+- Seal integration for encryption and key management
 
 ---
 

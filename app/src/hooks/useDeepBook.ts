@@ -8,12 +8,6 @@ interface DeepBookClients {
   deepbookClient: DeepBookClient;
 }
 
-/**
- * Hook to initialize DeepBook v3 client
- * Usage:
- *   const { initializeDeepBook } = useDeepBook();
- *   const clients = initializeDeepBook();
- */
 export function useDeepBook() {
   const account = useCurrentAccount();
 
