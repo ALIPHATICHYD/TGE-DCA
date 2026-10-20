@@ -1,6 +1,7 @@
+import { useMemo } from 'react';
 import { useCurrentAccount, useSuiClientQuery } from '@mysten/dapp-kit';
-
-const PACKAGE_ID = import.meta.env.VITE_PACKAGE_ID || import.meta.env.TGE_PACKAGE_ID || '0x0';
+import { IS_CONFIGURED, MODULE } from '../lib/config';
+import { parseVault, type Vault } from '../lib/vault';
 
 export function useVaults() {
   const account = useCurrentAccount();
@@ -10,7 +11,7 @@ export function useVaults() {
     {
       owner: account?.address || '',
       filter: {
-        StructType: `${PACKAGE_ID}::dca::DCAVault`,
+        StructType: `${MODULE}::DCAVault`,
       },
       options: {
         showContent: true,
@@ -18,14 +19,19 @@ export function useVaults() {
       },
     },
     {
-      enabled: !!account?.address,
-      refetchInterval: 5000, // Refetch every 5 seconds
+      enabled: !!account?.address && IS_CONFIGURED,
+      refetchInterval: 5000,
     }
   );
 
+  const vaults = useMemo(
+    () => (data?.data ?? []).map(parseVault).filter((v): v is Vault => v !== null),
+    [data]
+  );
+
   return {
-    vaults: data?.data || [],
-    isLoading,
+    vaults,
+    isLoading: isLoading && IS_CONFIGURED,
     error,
     refetch,
   };

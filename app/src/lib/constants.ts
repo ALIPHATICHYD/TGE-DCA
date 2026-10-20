@@ -1,13 +1,16 @@
-export const PACKAGE_ID = import.meta.env.TGE_PACKAGE_ID || '';
-export const NETWORK = import.meta.env.SUI_NETWORK || 'testnet';
+export { PACKAGE_ID, NETWORK, CLOCK_OBJECT_ID } from './config';
 
-export const CLOCK_OBJECT_ID = '0x6';
+const DAY = 86_400_000;
 
 export const FREQUENCY_OPTIONS = [
-  { label: 'Daily', value: 1, ms: 86400000 },
-  { label: 'Weekly', value: 7, ms: 604800000 },
-  { label: 'Bi-Weekly', value: 14, ms: 1209600000 },
-  { label: 'Monthly', value: 30, ms: 2592000000 },
+  { label: 'Day', days: 1, ms: DAY },
+  { label: 'Week', days: 7, ms: 7 * DAY },
+  { label: '2 weeks', days: 14, ms: 14 * DAY },
+  { label: 'Month', days: 30, ms: 30 * DAY },
 ];
 
-export const TARGET_ASSETS = ['SUI', 'USDC', 'USDT', 'WETH'];
+/** Deposits are SUI, so SUI is not a buy target. */
+export const TARGET_ASSETS = [
+  { symbol: 'USDC', note: 'DeepBook · SUI/USDC pool' },
+  { symbol: 'USDT', note: 'DeepBook · routed via USDC on testnet' },
+];

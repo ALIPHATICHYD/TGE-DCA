@@ -60,7 +60,6 @@ export function useSeal(opts?: UseSealOpts) {
     if (!sealClient) throw new Error('seal client not initialized');
     setLoading(true);
     try {
-      // @ts-ignore
       const SealModule = await import('@mysten/seal');
       const SessionKey = SealModule.SessionKey;
       const session = await SessionKey.create({

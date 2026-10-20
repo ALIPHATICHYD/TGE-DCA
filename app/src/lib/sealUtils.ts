@@ -22,7 +22,6 @@ export function decodeUtf8(bytes: Uint8Array): string {
 // Parse an EncryptedObject using the SDK if available. Falls back to returning null.
 export async function parseEncryptedObject(encryptedBytes: Uint8Array | string): Promise<any | null> {
   try {
-    // @ts-ignore
     const Seal = await import('@mysten/seal');
     const EncryptedObject = Seal.EncryptedObject;
     const bytes = typeof encryptedBytes === 'string' ? hexToUint8Array(encryptedBytes) : encryptedBytes;
