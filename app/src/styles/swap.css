@@ -1,0 +1,172 @@
+/* DeepBook swap panel (DeepBookSwapExecutor), in the TGE identity. */
+.swap-container {
+  border: 1px solid var(--bone);
+  padding: 20px;
+  margin: 16px 0;
+  background: var(--ink);
+  color: var(--bone);
+}
+
+.swap-container h3 {
+  margin: 0 0 16px;
+  font-weight: 800;
+  font-stretch: 62%;
+  font-size: 32px;
+  text-transform: uppercase;
+}
+
+.swap-error {
+  border: 1px solid var(--signal);
+  color: var(--signal);
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.price-section,
+.swap-form {
+  border: 1px solid var(--rule);
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.price-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.price-info strong {
+  color: var(--signal);
+  font-size: 16px;
+}
+
+.orderbook {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.orderbook-side {
+  border: 1px solid var(--rule);
+}
+
+.orderbook-side h4 {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+
+.orderbook-level {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 10px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--mute);
+}
+
+.input-row {
+  display: flex;
+  gap: 8px;
+}
+
+.form-group input {
+  flex: 1;
+  width: 100%;
+  min-height: 48px;
+  padding: 0 14px;
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  color: var(--bone);
+  font-family: var(--font-mono);
+  font-size: 16px;
+}
+
+.form-group input:disabled {
+  color: var(--dim);
+}
+
+.max-button {
+  min-height: 48px;
+  padding: 0 14px;
+  background: transparent;
+  border: 1px solid var(--rule);
+  color: var(--bone);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.max-button:hover:not(:disabled) {
+  background: var(--bone);
+  color: var(--ink);
+}
+
+.output-display {
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid var(--signal);
+  font-family: var(--font-mono);
+  color: var(--signal);
+  text-align: right;
+}
+
+.form-group small {
+  display: block;
+  margin-top: 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--mute);
+}
+
+.swap-button {
+  width: 100%;
+  min-height: 52px;
+  background: var(--signal);
+  color: var(--ink);
+  border: 0;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+
+.swap-button:disabled {
+  background: transparent;
+  border: 1px dashed var(--rule);
+  color: var(--dim);
+  cursor: not-allowed;
+}
+
+.tx-info {
+  border-left: 3px solid var(--signal);
+  padding: 10px 14px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--mute);
+}

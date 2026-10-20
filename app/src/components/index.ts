@@ -1,4 +1,4 @@
-export { CreateVault } from './CreateVault';
-export { VaultList } from './VaultList';
-export { WalletConnection } from './WalletConnection';
-export { WithdrawDialog } from './WithdrawDialog';
+export { ActivityLog } from './ActivityLog';
+export { ConfigNotice } from './ConfigNotice';
+export { MarketPanel } from './MarketPanel';
+export { DeepBookSwapComponent } from './DeepBookSwapExecutor';

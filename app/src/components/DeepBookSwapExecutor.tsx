@@ -6,7 +6,7 @@
 import { useState, useEffect } from 'react';
 import { useDeepBook } from '../hooks/useDeepBook';
 import { useDeepBookSwap } from '../hooks/useDeepBookSwap';
-import '../styles.css';
+import '../styles/swap.css';
 
 interface SwapComponentProps {
   vaultId: string;

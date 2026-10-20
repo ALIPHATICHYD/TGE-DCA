@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { DeepBookClient } from '@mysten/deepbook-v3';
 import { SuiClient, getFullnodeUrl } from '@mysten/sui/client';
 import { useCurrentAccount } from '@mysten/dapp-kit';
+import { DEEPBOOK_NETWORK } from '../lib/config';
 
 interface DeepBookClients {
   suiClient: SuiClient;
@@ -18,7 +19,7 @@ export function useDeepBook() {
     }
 
     try {
-      const network = (import.meta.env.VITE_DEEPBOOK_NETWORK || 'testnet') as 'testnet' | 'mainnet';
+      const network = DEEPBOOK_NETWORK;
 
       const suiClient = new SuiClient({
         url: getFullnodeUrl(network),

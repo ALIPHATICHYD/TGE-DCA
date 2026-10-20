@@ -1,44 +1,40 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import "@mysten/dapp-kit/dist/index.css";
-import "@radix-ui/themes/styles.css";
-import "./styles.css";
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import '@mysten/dapp-kit/dist/index.css';
+import './styles/theme.css';
 
-import { SuiClientProvider, WalletProvider } from "@mysten/dapp-kit";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Theme } from "@radix-ui/themes";
-import App from "./App.tsx";
-import { networkConfig } from "./networkConfig.ts";
+import { SuiClientProvider, WalletProvider } from '@mysten/dapp-kit';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import App from './App.tsx';
+import { networkConfig } from './networkConfig.ts';
+import { NETWORK } from './lib/config.ts';
+import { walletTheme } from './components/brand/walletTheme.ts';
+import { ToastProvider } from './components/layout/Toasts.tsx';
 
 const queryClient = new QueryClient();
 
-// Suppress wallet extension errors that don't affect functionality
+// Silence noise from unrelated injected browser-extension providers (e.g. EVM wallets).
 const originalError = console.error;
-console.error = (...args: any[]) => {
-  if (
-    typeof args[0] === 'string' &&
-    (args[0].includes('ethereum') ||
-      args[0].includes('WELLDONE') ||
-      args[0].includes('wallet'))
-  ) {
+console.error = (...args: unknown[]) => {
+  if (typeof args[0] === 'string' && (args[0].includes('ethereum') || args[0].includes('WELLDONE'))) {
     return;
   }
   originalError(...args);
 };
 
-const root = document.getElementById("root");
+const root = document.getElementById('root');
 if (root) {
   ReactDOM.createRoot(root).render(
     <React.StrictMode>
-      <Theme appearance="dark">
-        <QueryClientProvider client={queryClient}>
-          <SuiClientProvider networks={networkConfig} defaultNetwork="testnet">
-            <WalletProvider autoConnect>
+      <QueryClientProvider client={queryClient}>
+        <SuiClientProvider networks={networkConfig} defaultNetwork={NETWORK}>
+          <WalletProvider autoConnect theme={walletTheme}>
+            <ToastProvider>
               <App />
-            </WalletProvider>
-          </SuiClientProvider>
-        </QueryClientProvider>
-      </Theme>
+            </ToastProvider>
+          </WalletProvider>
+        </SuiClientProvider>
+      </QueryClientProvider>
     </React.StrictMode>
   );
 }

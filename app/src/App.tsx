@@ -1,54 +1,52 @@
-import { ConnectButton, useCurrentAccount } from "@mysten/dapp-kit";
-import { Box, Container, Flex, Heading } from "@radix-ui/themes";
-import { CreateVault } from "./components/CreateVault";
-import { VaultList } from "./components/VaultList";
+import { useCurrentAccount } from '@mysten/dapp-kit';
+import { Footer } from './components/layout/Footer';
+import { Header } from './components/layout/Header';
+import { CreateVault } from './pages/CreateVault';
+import { Dashboard } from './pages/Dashboard';
+import { Landing } from './pages/Landing';
+import { VaultDetail } from './pages/VaultDetail';
+import { href, useRoute } from './lib/router';
+
+function NotFound() {
+  return (
+    <main className="wrap" style={{ paddingBlock: 96, display: 'flex', flexDirection: 'column', gap: 24, alignItems: 'flex-start' }}>
+      <span className="eyebrow">404</span>
+      <h1 className="display" style={{ fontSize: 'clamp(64px, 10vw, 140px)' }}>
+        Nothing
+        <br />
+        here.
+      </h1>
+      <a className="btn btn-ghost btn-lg" href={href.home}>
+        Back home
+      </a>
+    </main>
+  );
+}
 
 function App() {
+  const route = useRoute();
   const account = useCurrentAccount();
+
+  let page;
+  switch (route.name) {
+    case 'home':
+      page = account ? <Dashboard /> : <Landing />;
+      break;
+    case 'create':
+      page = <CreateVault />;
+      break;
+    case 'vault':
+      page = account ? <VaultDetail id={route.id} /> : <Landing />;
+      break;
+    default:
+      page = <NotFound />;
+  }
 
   return (
     <>
-      <Flex
-        position="sticky"
-        px="4"
-        py="2"
-        justify="between"
-        style={{
-          borderBottom: "1px solid var(--gray-a2)",
-        }}
-      >
-        <Box>
-          <Heading>TGE DeFi - DCA Vault</Heading>
-        </Box>
-
-        <Box>
-          <ConnectButton />
-        </Box>
-      </Flex>
-      <Container>
-        <Container
-          mt="5"
-          pt="2"
-          px="4"
-          style={{ background: "var(--gray-a2)", minHeight: 500 }}
-        >
-          {!account ? (
-            <Box style={{ textAlign: "center", padding: "32px 0" }}>
-              <Heading size="4" mb="4">
-                Welcome to TGE DeFi DCA Vault
-              </Heading>
-              <Box style={{ color: "var(--gray-11)" }}>
-                Connect your wallet to create and manage DCA vaults
-              </Box>
-            </Box>
-          ) : (
-            <Flex direction="column" gap="6">
-              <CreateVault />
-              <VaultList />
-            </Flex>
-          )}
-        </Container>
-      </Container>
+      <Header route={route} />
+      {page}
+      <Footer />
     </>
   );
 }
